@@ -8,7 +8,7 @@ use std::{
 };
 
 use super::Storage;
-use crate::{Error::RangeError, Result};
+use crate::Result;
 
 /// 基于 Bitcast 的磁盘存储，参考论文 [Bitcask: A Log-Structured Hash Table for Key/Value Data](https://riak.com/assets/bitcask-intro.pdf)。
 ///
@@ -203,11 +203,6 @@ impl Storage for DiskStorage {
     type Iterator<'a> = DiskStorageIterator<'a>;
 
     fn put(&mut self, key: &[u8], value: &[u8]) -> Result<()> {
-        //! value 的长度不能超过 u32::MAX，以确保不同平台下的 usize 长度一致，且 value_len 的最高位能够反映 value 是否被删除。
-        if value.len() > u32::MAX as usize {
-            return Err(RangeError("value is too large".to_string()));
-        }
-
         let offset = self.log.seek(SeekFrom::End(0))?;
 
         let mut writer = BufWriter::with_capacity(

@@ -4,6 +4,7 @@ use crate::Result;
 
 mod disk;
 mod memory;
+mod mvcc;
 
 pub trait Storage {
     type Iterator<'a>: DoubleEndedIterator<Item = Result<(Vec<u8>, Vec<u8>)>>
